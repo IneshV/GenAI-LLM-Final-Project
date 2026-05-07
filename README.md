@@ -91,6 +91,7 @@ The notebook expects two API keys:
 ```text
 OPENAI_API_KEY   # used for ChatOpenAI
 SERPER_API_KEY   # used for web search through google.serper.dev
+HF_TOKEN         # used for loading model
 ```
 
 In Google Colab, add both keys using the built-in Secrets manager. Then the notebook loads them with:
@@ -101,13 +102,8 @@ import os
 
 os.environ["OPENAI_API_KEY"] = userdata.get("OPENAI_API_KEY")
 os.environ["SERPER_API_KEY"] = userdata.get("SERPER_API_KEY")
-```
+os.environ["HF_TOKEN"]       = userdata.get("HF_TOKEN")
 
-For local execution, create a `.env` file or export the variables in your terminal:
-
-```bash
-export OPENAI_API_KEY="your_openai_key"
-export SERPER_API_KEY="your_serper_key"
 ```
 
 ---
