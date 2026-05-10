@@ -34,7 +34,7 @@ results/                      # Evaluation outputs and generated figures
 test_cases/                   # Test files used for document upload / retrieval experiments
 ```
 
-The notebook is organized into these main sections:
+The main agent notebook is organized into these sections:
 
 ```text
 1. Setup
@@ -342,3 +342,5 @@ What are the differences between BERT and GPT architectures?
 ## Summary
 
 This project demonstrates how a research assistant agent can combine LLM reasoning with external tools. The ReAct agent performs better on tool selection and answer coverage in the small evaluation, while the CoT planning agent is more efficient. The specialized quote-search pipeline is especially useful for exact evidence retrieval from the Transformer paper.
+
+Note: HotpotQA was included in results/Run_all_tests.ipynb to avoid run time and memory issues
