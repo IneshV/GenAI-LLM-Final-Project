@@ -13,8 +13,9 @@ import shutil
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-NOTEBOOK = ROOT / "main_agent_demo_version.ipynb"
+ROOT = Path(__file__).resolve().parents[1]
+NOTEBOOK = ROOT / "notebooks" / "main_agent_demo_version.ipynb"
+OCR_HELPER = ROOT / "src" / "extract_pdf_text_with_ocr.py"
 
 
 def check(condition, message):
@@ -66,12 +67,12 @@ def check_project_files():
         "requirements-evaluation.txt exists",
     )
     ok &= check((ROOT / ".gitignore").exists(), ".gitignore exists")
-    ok &= check((ROOT / "extract_pdf_text_with_ocr.py").exists(), "OCR helper file exists")
+    ok &= check(OCR_HELPER.exists(), "OCR helper file exists")
     return ok
 
 
 def check_ocr_helper_import():
-    helper = ROOT / "extract_pdf_text_with_ocr.py"
+    helper = OCR_HELPER
     if not helper.exists():
         print("[FAIL] extract_pdf_text_with_ocr.py not found")
         return False
