@@ -1,13 +1,13 @@
 # Research Assistant Agent
 
-A LangChain-based research assistant that answers research questions by using external tools instead of relying only on the language model’s internal knowledge.
+A LangChain-based research assistant that answers research questions using external tools instead of relying only on the language model's internal knowledge.
 
 The project compares two agent strategies:
 
 1. **ReAct agent**: chooses tools step-by-step during execution after observing previous tool outputs.
 2. **Chain-of-Thought planning agent**: creates a fixed tool-use plan first, executes the planned tools, and then synthesizes an answer.
 
-The system can search the web, query Wikipedia, fetch and read PDFs, summarize an active document, retrieve exact verified quotes from a loaded document, and generate conservative citations without inventing missing metadata. The project also includes evaluations comparing ReAct and CoT on curated research questions, HotpotQA multi-hop questions, and citation-focused quote retrieval.
+The system can search the web, query Wikipedia, fetch and read PDFs, summarize an active document, retrieve exact verified quotes from a loaded document, and generate conservative citations without inventing missing metadata. The repository also includes automated tests, documentation for reproducing experiments, and evaluation notebooks comparing ReAct and CoT.
 
 ---
 
@@ -28,7 +28,8 @@ The system can search the web, query Wikipedia, fetch and read PDFs, summarize a
 - HotpotQA multi-hop QA evaluation
 - Statistical significance tests
 - Ablation study for the quote-search tool
-- Generated evaluation figures
+- Unit tests, demo-input tests, and GitHub Actions workflow
+- Generated evaluation figures and reproducibility documentation
 
 ---
 
@@ -36,24 +37,43 @@ The system can search the web, query Wikipedia, fetch and read PDFs, summarize a
 
 ```text
 .
-├── data/                              # Local data files and dataset inputs
+├── .github/
+│   └── workflows/
+│       └── tests.yml                     # GitHub Actions workflow for automated testing
+├── docs/
+│   ├── experiment_setup.md               # Experimental setup and reproducibility notes
+│   └── troubleshooting.md                # Common setup/runtime issues and fixes
 ├── notebooks/
-│   ├── main_agent_demo_version.ipynb  # Main notebook with tools, agents, evaluation, and demo
-│   └── Run_all_tests.ipynb            # Notebook for full evaluation workflows
+│   ├── main_agent_demo_version.ipynb     # Main notebook with tools, agents, evaluation, and demo
+│   └── Run_all_tests.ipynb               # Notebook for full evaluation workflows
 ├── results/
-│   └── react_vs_cot_comparison.png    # Generated ReAct vs. CoT comparison figure
+│   └── react_vs_cot_comparison.png       # Generated ReAct vs. CoT comparison figure
 ├── src/
-│   └── extract_pdf_text_with_ocr.py   # OCR-based PDF text extraction helper
-├── test_cases/                        # Test documents for upload, OCR, and retrieval experiments
+│   └── extract_pdf_text_with_ocr.py      # OCR-based PDF text extraction helper
+├── test_cases/                           # Test documents for upload, OCR, and retrieval experiments
 │   ├── 400-motivational-quotes.pdf
-│   ├── scanned_pdf_test_document.pdf
-│   └── sample_upload_test_document... # Sample uploaded document test file
-├── README.md                          # Project documentation
-├── requirements.txt                   # Core project dependencies
-└── requirements-evaluation.txt        # Extra dependencies for evaluation experiments
+│   ├── Untitled document_copy.pdf
+│   ├── sample_upload_test_document.txt
+│   └── scanned_pdf_test_document.pdf
+├── tests/
+│   ├── test_basic.py                     # Basic repository/import/path tests
+│   └── test_demo_inputs.py               # Tests for demo/test-case inputs
+├── .gitignore
+├── README.md
+├── requirements.txt                      # Core project dependencies
+└── requirements-evaluation.txt           # Extra dependencies for evaluation experiments
 ```
 
-The main notebook is organized around setup, tool definitions, quote retrieval, agent implementations, testing, evaluation, statistical significance, ablations, and the demo interface.
+---
+
+## Repository Documentation
+
+Additional documentation is included in the `docs/` folder:
+
+- `docs/experiment_setup.md`: explains the experimental setup, benchmark organization, and how to reproduce results.
+- `docs/troubleshooting.md`: lists common issues with API keys, package installation, PDF extraction, OCR, and notebook execution.
+
+These files are intended to support reproducibility and make the project easier to grade, run, and debug.
 
 ---
 
@@ -65,12 +85,6 @@ Install the core dependencies with:
 
 ```bash
 pip install -r requirements.txt
-```
-
-Or install manually:
-
-```bash
-pip install langchain langchain-openai langchain-community langchain-classic openai wikipedia-api requests beautifulsoup4 PyPDF2 python-dotenv sentence-transformers transformers torch "gradio>=5.0,<6.0"
 ```
 
 For evaluation workflows, also install:
@@ -134,6 +148,8 @@ SERPER_API_KEY=your_serper_key
 HF_TOKEN=your_huggingface_token
 ```
 
+Do not commit API keys to GitHub.
+
 ---
 
 ## How to Run
@@ -143,9 +159,10 @@ HF_TOKEN=your_huggingface_token
 1. Open `notebooks/main_agent_demo_version.ipynb` in Google Colab.
 2. Add `OPENAI_API_KEY` and `SERPER_API_KEY` in Colab Secrets.
 3. Run the setup cells.
-4. Run the tool-definition cells.
-5. Run the agent implementation cells.
-6. Test the agent with:
+4. Run the API-key loading cell.
+5. Run the tool-definition cells.
+6. Run the agent implementation cells.
+7. Test the agent with:
 
 ```python
 question = "What were the key contributions of the Attention Is All You Need paper?"
@@ -156,13 +173,13 @@ print(result["tools_used"])
 print(result["num_steps"])
 ```
 
-7. Run the evaluation sections to compare ReAct and CoT.
-8. Run the plotting cells to generate figures in `results/`.
+8. Run the evaluation sections to compare ReAct and CoT.
+9. Run the plotting cells to generate figures in `results/`.
 
 ### Option 2: Local Notebook
 
-1. Clone or download the project.
-2. Create a virtual environment:
+1. Clone the repository.
+2. Create and activate a virtual environment:
 
 ```bash
 python -m venv .venv
@@ -229,6 +246,9 @@ The quote-search pipeline:
 6. Reranks candidates with a cross-encoder.
 7. Verifies that each returned quote appears exactly in the source text.
 
+### `summarize_active_document(query)`
+
+Summarizes or answers questions about the currently loaded document.
 
 ### `find_paper_quotes(query)`
 
@@ -250,9 +270,7 @@ Find papers to reference and quotes to support this.
 
 ### ReAct Agent
 
-The ReAct agent uses LangChain’s tool-calling agent abstraction. It chooses tools iteratively during execution based on the current question and previous tool outputs.
-
-Example:
+The ReAct agent uses LangChain's tool-calling agent abstraction. It chooses tools iteratively during execution based on the current question and previous tool outputs.
 
 ```python
 result = run_react(
@@ -269,8 +287,6 @@ print(result["num_steps"])
 
 The CoT agent first generates a JSON research plan, then executes that plan and synthesizes the final answer. It is less adaptive than ReAct but usually uses fewer tool calls.
 
-Example:
-
 ```python
 result = run_cot(
     "Explain the HNSW algorithm for approximate nearest neighbor search.",
@@ -281,6 +297,43 @@ print(result["output"])
 print(result["tools_used"])
 print(result["num_steps"])
 ```
+
+---
+
+## Testing
+
+This repository includes automated tests under `tests/` and a GitHub Actions workflow under `.github/workflows/tests.yml`.
+
+### Run tests locally
+
+From the repository root, run:
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements-evaluation.txt
+pytest tests/ -v
+```
+
+### Test files
+
+```text
+tests/test_basic.py          # Checks basic repository structure and required files
+tests/test_demo_inputs.py    # Checks demo/test-case files used by the notebook
+```
+
+### GitHub Actions
+
+The workflow file:
+
+```text
+.github/workflows/tests.yml
+```
+
+runs the test suite automatically when code is pushed or a pull request is opened. This supports the automated testing bonus and helps catch missing files or broken setup before submission.
+
+### Notes on testing
+
+The tests are intentionally lightweight. They are designed to verify repository organization, required files, and demo inputs without requiring paid API calls. Full agent evaluation still requires valid OpenAI and Serper API keys and is run from the notebooks.
 
 ---
 
@@ -301,7 +354,7 @@ Metrics include:
 - **Average Tool Steps**
 - **Runtime**
 
-Example questions include:
+Example prompts:
 
 ```text
 What is RAG and how does it reduce hallucinations?
@@ -346,7 +399,7 @@ find_paper_quotes produced verified, claim-level supporting quotes, while the ge
 
 ### 4. HotpotQA Multi-Hop QA Evaluation
 
-HotpotQA evaluation was run in `notebooks/Run_all_tests.ipynb` to avoid runtime and memory issues in the main demo notebook.
+HotpotQA evaluation is included in `notebooks/Run_all_tests.ipynb` to avoid runtime and memory issues in the main demo notebook.
 
 This evaluation compares ReAct and CoT on 100 HotpotQA validation questions:
 
@@ -377,7 +430,7 @@ ReAct required more tool calls, took longer, and had more max-iteration failures
 Key findings:
 
 ```text
-1. ReAct was more adaptive and better at exploring tools, especially in the curated benchmark.
+1. ReAct was more adaptive and better at exploring tools in the curated benchmark.
 2. CoT was usually faster and more efficient because it used fewer tool calls.
 3. On HotpotQA, CoT slightly outperformed ReAct in accuracy, but not significantly.
 4. ReAct had a higher cost due to extra tool calls and max-iteration failures.
@@ -404,6 +457,26 @@ hotpotqa_n100_efficiency.png
 
 ---
 
+## Troubleshooting
+
+Common issues and fixes are documented in:
+
+```text
+docs/troubleshooting.md
+```
+
+Typical issues include:
+
+- Missing `OPENAI_API_KEY` or `SERPER_API_KEY`
+- Serper API request failures
+- PDF extraction failures on scanned or image-based PDFs
+- Hugging Face model download delays
+- Colab dependency warnings
+- Notebook runtime disconnections
+- Slow evaluation due to repeated web/API calls
+
+---
+
 ## Notes and Limitations
 
 - Web search requires a valid Serper API key.
@@ -422,6 +495,7 @@ hotpotqa_n100_efficiency.png
 
 ## Future Improvements
 
+- Add automatic paper retrieval and loading for quote search.
 - Support indexing multiple uploaded documents at once.
 - Store document embeddings in a vector database.
 - Add stronger source-grounded answer verification.
@@ -429,7 +503,7 @@ hotpotqa_n100_efficiency.png
 - Expand evaluation beyond the current benchmark sizes.
 - Add better stopping rules for ReAct to reduce over-searching.
 - Cache web and PDF results to reduce repeated calls and latency.
-- Evaluate additional backbone models such as Llama, Qwen, or Claude.
+- Evaluate additional backbone models such as Llama or Qwen.
 - Add LLM-as-judge or embedding-based evaluation metrics.
 
 ---
