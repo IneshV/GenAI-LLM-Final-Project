@@ -173,9 +173,6 @@ print(result["tools_used"])
 print(result["num_steps"])
 ```
 
-8. Run the evaluation sections to compare ReAct and CoT.
-9. Run the plotting cells to generate figures in `results/`.
-
 ### Option 2: Local Notebook
 
 1. Clone the repository.
