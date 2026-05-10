@@ -28,9 +28,10 @@ The agent can search the web, query Wikipedia, fetch and read PDFs, retrieve exa
 ## Project Structure
 
 ```text
-main_agent.ipynb              # Main notebook containing setup, tools, agents, evaluation, and demo
-react_vs_cot_comparison.png   # Output chart generated during evaluation
+main_agent.ipynb              # Main notebook with setup, tools, agents, evaluation, and demo
 README.md                     # Project documentation
+results/                      # Evaluation outputs and generated figures
+test_cases/                   # Test files used for document upload / retrieval experiments
 ```
 
 The notebook is organized into these main sections:
