@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 *.extracted.txt
 .DS_Store
+.idea/
