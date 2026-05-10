@@ -28,12 +28,13 @@ The agent can search the web, query Wikipedia, fetch and read PDFs, retrieve exa
 ## Project Structure
 
 ```text
-main_agent.ipynb              # Main notebook containing setup, tools, agents, evaluation, and demo
-react_vs_cot_comparison.png   # Output chart generated during evaluation
+main_agent.ipynb              # Main notebook with setup, tools, agents, evaluation, and demo
 README.md                     # Project documentation
+results/                      # Evaluation outputs and generated figures
+test_cases/                   # Test files used for document upload / retrieval experiments
 ```
 
-The notebook is organized into these main sections:
+The main agent notebook is organized into these sections:
 
 ```text
 1. Setup
@@ -341,3 +342,5 @@ What are the differences between BERT and GPT architectures?
 ## Summary
 
 This project demonstrates how a research assistant agent can combine LLM reasoning with external tools. The ReAct agent performs better on tool selection and answer coverage in the small evaluation, while the CoT planning agent is more efficient. The specialized quote-search pipeline is especially useful for exact evidence retrieval from the Transformer paper.
+
+Note: HotpotQA was included in results/Run_all_tests.ipynb to avoid run time and memory issues
